@@ -40,6 +40,8 @@ const {uploadSlider} =require('../controllers/mdslidercontroller');
 const {uploadPreview} =require('../controllers/mdpreviewcontroller');
 const{ register,login }= require('../controllers/usercontroller');
 
+const{uploadBanner, getBanner ,deleteBanner}=require('../controllers/bannercontroller');
+
 app.post('/register', register);
 app.post('/login', login);
 
@@ -72,5 +74,10 @@ app.post('/api/productslider', upload.array('sliderImage'), uploadSlider);
 app.post('/api/productpreview', upload.array('previewImage'), uploadPreview);
 app.get('/api/product/getproductbyid/:productid',getproductbyid);
 app.post('/api/product/modify',upload.single('file'), modify);
+
+// Banner Upload Request
+app.post('/api/banner', upload.array('bannerimage'), uploadBanner);
+app.get('/api/getbanner',getBanner);
+app.delete('/api/removebanner/:id', deleteBanner)
 
 module.exports = app;

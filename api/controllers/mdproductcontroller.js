@@ -79,10 +79,10 @@ const saveproduct = async (req, res) => {
 
 // API List of all  product 
 const getAllProduct = async (req, res) => {
-    const token = req.headers['authorization'];
-    if (!token) {
-        return res.status(401).send({ auth: false, message: 'unauthorized user.' });
-    }
+    // const token = req.headers['authorization'];
+    // if (!token) {
+    //     return res.status(401).send({ auth: false, message: 'unauthorized user.' });
+    // }
     console.log("Get Product API call");
     productColl.find().populate('category').populate('subcategory').populate('tools').then((data) => {
         res.status(200).send(data)
@@ -107,14 +107,14 @@ const deleteproduct = async (req, res) => {
 
 // API Get data of product using product id
 const getproductbyid = async (req, res) => {
-    const token = req.headers['authorization'];
-    if (!token) {
-        return res.status(401).send({ auth: false, message: 'unauthorized user.' });
-    }
+    // const token = req.headers['authorization'];
+    // if (!token) {
+    //     return res.status(401).send({ auth: false, message: 'unauthorized user.' });
+    // }
     console.log("Get Product API call by id");
     let data = { product: {}, productslider: [], productPreview: [] };
     // get data of main product collection/table
-    productColl.findOne({ _id: req.params.productid }).then((resproduct) => {
+    productColl.findOne({ _id: req.params.productid }).populate('tools').then((resproduct) => {
         console.log(resproduct);
         if (resproduct) {
             data.product = resproduct;

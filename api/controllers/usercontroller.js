@@ -24,7 +24,6 @@ const login = async (req, res, next) => {
       if (!user) {
         console.log("UID:" + user.username)
         return res.send({ status: 401, message: "Unauthorized User" });
-        return res.sendStatus(401);
       }
       return req.logIn(user, (loginErr) => {
         if (loginErr) return res.sendStatus(401);
