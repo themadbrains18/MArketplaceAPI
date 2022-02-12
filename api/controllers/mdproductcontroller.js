@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
+const fs = require("fs");
 var { sliderColl } = require('./mdslidercontroller');
 var { previewColl } = require('./mdpreviewcontroller');
+
 var Schema = mongoose.Schema;
 
 
@@ -98,11 +100,74 @@ const deleteproduct = async (req, res) => {
         return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     }
     console.log("req.body", req.params);
-    productColl.deleteOne({ _id: req.params.id }).then((data) => {
-        res.send(data)
+    productColl.findOne({ _id: req.params.id }).then((result) => {
+        if (result) {
+            // product slider remove from productslider table and image file from directory
+            sliderColl.find({ productid: req.params.id }).then((resultslider) => {
+                if (resultslider.length > 0) {
+                    for (let j = 0; j < resultslider.length; j++) {
+                        console.log("image Name " + resultslider[j].image);
+                        const pathToFile = './public/images/' + resultslider[j].image
+                        fs.unlink(pathToFile, function (err) {
+                            if (err) {
+                                throw err
+                            } else {
+                                console.log("Successfully deleted the file.")
+                            }
+                        })
+                    }
+                    sliderColl.deleteMany({ productid: req.params.id }).then((removedata) => {
+                        console.log("slider remove : " + removedata);
+                    })
+                }
+            }).catch((err) => {
+                res.send(err);
+            });
+
+            // product preview remove from productpreview table and image file from directory
+            previewColl.find({ productid: req.params.id }).then((resultpre) => {
+                if (resultpre.length > 0) {
+                    for (let j = 0; j < resultpre.length; j++) {
+                        console.log("image Name " + resultpre[j].image);
+                        const pathToFile = './public/images/' + resultpre[j].image
+                        fs.unlink(pathToFile, function (err) {
+                            if (err) {
+                                throw err
+                            } else {
+                                console.log("Successfully deleted the file.")
+                            }
+                        })
+                    }
+                    previewColl.deleteMany({ productid: req.params.id }).then((removedata) => {
+                        console.log("preview remove : " + removedata);
+                    })
+                }
+            }).catch((err) => {
+                console.log("Product remove error");
+                res.send(err);
+            });
+
+            // product remove from product table
+            productColl.deleteOne({ _id: req.params.id }).then((data) => {
+                console.log("image Name " + result.image);
+                const pathToFile = './public/images/' + result.image
+                fs.unlink(pathToFile, function (err) {
+                    if (err) {
+                        throw err
+                    } else {
+                        console.log("Successfully deleted the file.")
+                    }
+                })
+                res.send(data)
+            }).catch((err) => {
+                console.log("Product remove error");
+                res.send(err);
+            })
+        }
     }).catch((err) => {
         res.send(err);
     })
+
 }
 
 // API Get data of product using product id
@@ -193,10 +258,26 @@ const modify = async (req, res) => {
 
 }
 
+
+// API List of all  product by subcategory eg: web, mobile
+const getAllProductBySubcategory = async (req, res) => {
+    // const token = req.headers['authorization'];
+    // if (!token) {
+    //     return res.status(401).send({ auth: false, message: 'unauthorized user.' });
+    // }
+    console.log("type : " + req.params.type);
+    productColl.find({ subcategory: req.params.type }).populate('category').populate('subcategory').populate('tools').then((data) => {
+        res.status(200).send(data)
+    }).catch((err) => {
+        res.send(err);
+    })
+}
+
 module.exports = {
     saveproduct,
     getAllProduct,
     deleteproduct,
     getproductbyid,
-    modify
+    modify,
+    getAllProductBySubcategory
 }

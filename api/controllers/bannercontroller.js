@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const fs = require("fs")
 
 const bannerSchema = new mongoose.Schema({
 
@@ -32,27 +32,43 @@ const uploadBanner = (req, res) => {
     }
 }
 
-const getBanner= (req,res)=>{
+const getBanner = (req, res) => {
     bannerColl.find().then((data) => {
-        console.log("success banner data");
-        let bannerData=[];
+        let bannerData = [];
         if (data.length > 0) {
             for (let j = 0; j < data.length; j++) {
                 bannerData.push(data[j]);
             }
             return res.status(200).send(bannerData);
         }
+        else{return res.status(200).send(bannerData);}
     }).catch((err) => {
         res.send(err);
     })
 }
 
-const deleteBanner=(req,res)=>{
-    bannerColl.deleteOne({ _id: req.params.id }).then((data) => {
-        res.send(data)
+const deleteBanner = (req, res) => {
+    bannerColl.findOne({ _id: req.params.id }).then((result)=>{
+        console.log("banner image " +result.image)
+        bannerColl.deleteOne({ _id: req.params.id }).then((data) => {
+            if(data.deletedCount>0){
+                const pathToFile = './public/images/' +result.image
+                fs.unlink(pathToFile, function (err) {
+                    if (err) {
+                        throw err
+                    } else {
+                        console.log("Successfully deleted the file.")
+                        res.send(data)
+                    }
+                })
+            }
+        }).catch((err) => {
+            res.send(err);
+        })
     }).catch((err) => {
         res.send(err);
     })
+    
 }
 
 

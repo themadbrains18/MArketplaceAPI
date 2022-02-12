@@ -26,13 +26,17 @@
     "nodemon": "^1.11.0"
   },
   "dependencies": {
+    "axios": "^0.25.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.15.2",
     "connect-ensure-login": "^0.1.1",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "express": "^4.14.0",
+    "express-mailer": "^0.3.1",
     "express-session": "^1.17.2",
+    "fs": "^0.0.1-security",
+    "jade": "^1.11.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.14",
     "mssql": "^7.2.1",
@@ -40,6 +44,7 @@
     "passport": "^0.5.2",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^6.1.0",
+    "path": "^0.12.7",
     "pg": "^8.7.1"
   }
 }

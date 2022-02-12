@@ -1,14 +1,25 @@
 const mongoose = require('mongoose');
-const passport = require('passport');  // authentication
 const passportLocalMongoose = require('passport-local-mongoose');
-const connectEnsureLogin = require('connect-ensure-login');
 const bcrypt = require("bcrypt");
 var Schema = mongoose.Schema;
 
 const User = new Schema({
-    username: String,
-    passwordHash: String
-});
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    username: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    passwordHash:{
+        type: String,
+        required: true,
+        trim: true,
+    }
+}, { timestamps: true });
 
 User.methods.validPassword = function (password) {
     return bcrypt.compareSync(password, this.passwordHash);

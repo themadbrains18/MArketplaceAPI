@@ -1,12 +1,43 @@
-var  express = require('express');
+var express = require('express');
 const session = require('express-session');
 const passport = require('passport');  // authentication
 const LocalStrategy = require("passport-local").Strategy;
-var  cors = require('cors');
-var  app = express();
-var  router = express.Router();
+var cors = require('cors');
+const mailer = require('express-mailer');
+const path = require('path');
+var app = express();
+var router = express.Router();
 
-const {userColl} = require('./api/models/user'); // User Model
+
+const { smtp_host, smtp_port, smtp_user, smtp_password, SMTP_SECURE } = require('./dbconfig');
+
+const { userColl } = require('./api/models/user'); // User Model
+
+if (smtp_user == '') {
+  mailer.extend(app, {
+    from: smtp_user,
+    host: smtp_host,
+    secureConnection: SMTP_SECURE,
+    port: smtp_port,
+    transportMethod: 'SMTP'
+  });
+} else {
+  mailer.extend(app, {
+    from: smtp_user,
+    host: smtp_host,
+    secureConnection: SMTP_SECURE,
+    port: smtp_port,
+    transportMethod: 'SMTP',
+    auth: {
+      user: smtp_user,
+      pass: smtp_password
+    }
+  });
+}
+
+// Configure the path of email template
+app.set('views', path.dirname('../') + '/api/views');
+app.set('view engine', 'jade');
 
 // Configure Sessions Middleware
 app.use(session({
@@ -19,7 +50,7 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use(express.static('public')); 
+app.use(express.static('public'));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -53,7 +84,26 @@ router.use((request, response, next) => {
   next();
 });
 
-var  port = process.env.PORT || 3002;
+// Send Mail Against when After ContactUs..
+app.post('/api/sendDownloadEmail', (req, res, next) => {
+
+  console.log("contact us email API");
+  console.log(req.body.email);
+  app.mailer.send('download', {
+      to: req.body.email,
+      subject: `Market Place Download Template`,
+      data: { url: req.body.url, name : req.body.name }
+  }, (err) => {
+      if (err) {
+
+          res.send({ errorMessage: 'There was an error sending the email', errorInfo: err });
+          return;
+      }
+      res.send({ successMessage: 'Email has been sent', status: 200 });
+  });
+});
+
+var port = process.env.PORT || 3002;
 app.listen(port);
 console.log('Order API is runnning at ' + port);
 

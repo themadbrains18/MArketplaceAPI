@@ -1,0 +1,49 @@
+html
+  head
+    style.
+      .wrapper{
+      padding:0;
+      width:70%;
+      }
+      .wrapper .logo{
+      text-align:left;
+      font-weight:bold;
+      }
+      .wrapper .linkButton a{
+      padding:10px 60px;
+      background:#426d9c;
+      border:none;
+      text-decoration:none;
+      cursor:pointer;
+      color:white;
+      margin-bottom:20px;
+      border-radius:8px;
+      }
+      p{
+      text-decoration:none;
+      }
+  |   
+  body
+    .wrapper
+      .logo
+        //- img(src='https://everyurban.com/wp-content/uploads/2018/08/logo-everyurban.png')
+        img(src='https://themadbrains.com/assets/img/logo.png')
+      | &#x9;
+      | &#x9;
+      //- p Hello! #{data.email}
+      | &#x9;
+      .ct-body
+        p
+          | #{data.name}
+          br
+          | Thank you for downloading request.
+        | &#x9;
+
+        | &#x9;
+        p
+          | Please click on below link to download url template
+        | &#x9;
+        
+        | &#x9;
+        p
+          | #{data.url}

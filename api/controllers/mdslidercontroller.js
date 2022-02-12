@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const fs = require("fs")
 var Schema = mongoose.Schema;
 
 const sliderSchema = new mongoose.Schema({
@@ -20,6 +21,29 @@ const uploadSlider = (req, res) => {
     const { productid } = req.body;
     console.log(productid);
     console.log(req.files.length);
+    sliderColl.find({ productid: productid }).then((result) => {
+        if (result.length > 0) {
+            for (let j = 0; j < result.length; j++) {
+                console.log("image Name "+ result[j].image);
+                const pathToFile = './public/images/' + result[j].image
+                fs.unlink(pathToFile, function (err) {
+                    if (err) {
+                        throw err
+                    } else {
+                        console.log("Successfully deleted the file.")
+                    }
+                })
+            }
+            deleteSlider(productid,req,res);
+        }
+        else {
+            deleteSlider(productid,req,res);
+        }
+    })
+
+}
+
+const deleteSlider = (productid,req,res) => {
     sliderColl.deleteMany({ productid: productid }).then((data) => {
         console.log(data);
         if (data.ok > 0) {
