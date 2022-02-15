@@ -103,7 +103,7 @@ app.post('/api/sendDownloadEmail', (req, res, next) => {
   });
 });
 
-var port = process.env.PORT || 3002;
+var port = 3002;
 app.listen(port);
 console.log('Order API is runnning at ' + port);
 

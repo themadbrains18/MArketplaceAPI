@@ -16,7 +16,8 @@ const register = async (req, res) => {
     else{
       userColl.create({ name: req.body.name, username: req.body.username, password: req.body.password }).then((data) => {
         console.log("registerdata " +data);
-        res.send(data)
+        return res.send({ status: 200, message : 'You have register successfully.' });
+        // res.send(data)
       }).catch((err) => {
         res.send(err);
       })
