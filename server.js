@@ -145,6 +145,6 @@ app.post('/api/sendForgetPassword', (req, res, next) => {
 
 
 var port = 3002;
-app.listen(port);
+app.listen(process.env.PORT || 3002);
 console.log('Order API is runnning at ' + port);
 
