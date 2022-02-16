@@ -14,6 +14,10 @@ const User = new Schema({
         required: true,
         trim: true,
     },
+    is_EmailVerified :{
+        type: Boolean,
+        default: false
+    },
     passwordHash:{
         type: String,
         required: true,

@@ -84,7 +84,7 @@ router.use((request, response, next) => {
   next();
 });
 
-// Send Mail Against when After ContactUs..
+// Send Mail Against when Download Template..
 app.post('/api/sendDownloadEmail', (req, res, next) => {
 
   console.log("contact us email API");
@@ -102,6 +102,47 @@ app.post('/api/sendDownloadEmail', (req, res, next) => {
       res.send({ successMessage: 'Email has been sent', status: 200 });
   });
 });
+
+// Send Mail Against when Download Template..
+app.post('/api/sendVerificationEmail', (req, res, next) => {
+
+  const{email, name}=req.body;
+  console.log(req.body.email);
+  const confirmEmailUrl=`users/verifysuccess/${email}`;
+  app.mailer.send('verificationemail', {
+      to: req.body.email,
+      subject: `MadBrains-Confirm your Email`,
+      data:{greet:"Hi!"+" "+ email, hostName: 'http://localhost:3000/#', emailConfirmUrl: confirmEmailUrl}
+  }, (err) => {
+      if (err) {
+
+          res.send({ errorMessage: 'There was an error sending the email', errorInfo: err });
+          return;
+      }
+      res.send({ successMessage: 'Email has been sent', status: 200 });
+  });
+});
+
+// Send Mail Against when Download Template..
+app.post('/api/sendForgetPassword', (req, res, next) => {
+
+  const{email}=req.body;
+  console.log(req.body.email);
+  const forgetpasswordUrl=`users/forgetpassword/${email}`;
+  app.mailer.send('forgetpassword', {
+      to: req.body.email,
+      subject: `MadBrains-Forget Password`,
+      data:{greet:"Hi!"+" "+ email, hostName: 'http://localhost:3000/#', forgetpasswordUrl: forgetpasswordUrl}
+  }, (err) => {
+      if (err) {
+
+          res.send({ errorMessage: 'There was an error sending the email', errorInfo: err });
+          return;
+      }
+      res.send({ successMessage: 'Email has been sent', status: 200 });
+  });
+});
+
 
 var port = 3002;
 app.listen(port);

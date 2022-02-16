@@ -28,21 +28,15 @@ html
       .logo
         img(src='https://themadbrains.com/assets/img/logo.png')
       | &#x9;
+      p #{data.greet}
       | &#x9;
-      //- p Hello! #{data.email}
+      p
+        | Your account registration is almost complete.Please confirm your email by clicking the button below.
       | &#x9;
-      .ct-body
-        p
-          | #{data.name}
-          br
-          | Thank you for downloading request.
+      .linkButton
+        br
         | &#x9;
-
+        a(href='#{data.hostName}/#{data.emailConfirmUrl}') Confirm E-Mail
         | &#x9;
-        p
-          | Please click on below link to download url template
-        | &#x9;
-        
-        | &#x9;
-        p
-          | #{data.url}
+        br
+        br

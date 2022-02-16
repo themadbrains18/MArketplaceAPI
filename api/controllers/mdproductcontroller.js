@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const fs = require("fs");
 var { sliderColl } = require('./mdslidercontroller');
 var { previewColl } = require('./mdpreviewcontroller');
+var { productDownloadColl } = require('./mdproductdownloadcontroller');
 
 var Schema = mongoose.Schema;
 
@@ -177,7 +178,7 @@ const getproductbyid = async (req, res) => {
     //     return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     // }
     console.log("Get Product API call by id");
-    let data = { product: {}, productslider: [], productPreview: [] };
+    let data = { product: {}, productslider: [], productPreview: [] , downloadablefile: {} };
     // get data of main product collection/table
     productColl.findOne({ _id: req.params.productid }).populate('tools').then((resproduct) => {
         console.log(resproduct);
@@ -199,11 +200,21 @@ const getproductbyid = async (req, res) => {
                         for (let j = 0; j < preview.length; j++) {
                             data.productPreview.push(preview[j]);
                         }
-                        return res.status(200).send(data);
                     }
-                    else {
-                        return res.status(200).send(data);
-                    }
+
+                    // get Download File
+                    productDownloadColl.find({productid: req.params.productid}).then((downloadfile)=>{
+                        if(downloadfile){
+                            data.downloadablefile=downloadfile;
+                            return res.status(200).send(data);
+                        }
+                        else {
+                            return res.status(200).send(data);
+                        }
+                    }).catch((err) => {
+                        res.send(err);
+                    })
+                    
                 }).catch((err) => {
                     res.send(err);
                 })

@@ -17,6 +17,7 @@ var storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     console.log(file);
+    console.log('file mime type ' + file.mimetype);
     var filetype = '';
     if (file.mimetype === 'image/gif') {
       filetype = 'gif';
@@ -27,7 +28,19 @@ var storage = multer.diskStorage({
     if (file.mimetype === 'image/jpeg') {
       filetype = 'jpg';
     }
-    cb(null, 'image-' + Date.now() + '.' + filetype);
+    if (file.mimetype == 'application/x-zip-compressed') {
+      filetype = 'zip';
+    }
+    if (file.mimetype == 'application/octet-stream') {
+      filetype = 'xd';
+    }
+    if(filetype == 'zip' || filetype == 'xd'){
+      cb(null, 'templatefile-' + Date.now() + '.' + filetype);
+    }
+    else{
+      cb(null, 'image-' + Date.now() + '.' + filetype);
+    }
+    
   }
 });
 var upload = multer({ storage: storage, limits: { fieldSize: 25 * 1024 * 1024 } });
@@ -38,12 +51,16 @@ const { savetool, getAllTool, getToolsById, deleteTools, editTools } = require('
 const { saveproduct, getAllProduct, deleteproduct, getproductbyid, modify, getAllProductBySubcategory } = require('../controllers/mdproductcontroller');
 const { uploadSlider } = require('../controllers/mdslidercontroller');
 const { uploadPreview } = require('../controllers/mdpreviewcontroller');
-const { register, login , downloadTemplate } = require('../controllers/usercontroller');
-
+const { register, login, downloadTemplate, verifyemail, forgetpassword, changepassword } = require('../controllers/usercontroller');
 const { uploadBanner, getBanner, deleteBanner } = require('../controllers/bannercontroller');
+const { uploadDownloadFile } = require('../controllers/mdproductdownloadcontroller');
 
 app.post('/api/register', register);
 app.post('/api/login', login);
+app.post('/api/verifyemail', verifyemail);
+app.post('/api/forgetpassword', forgetpassword);
+app.post('/api/changepassword', changepassword)
+
 app.post('/api/download', downloadTemplate);
 // API Category with MongoDB
 app.post('/api/category/save', savecategory);
@@ -75,6 +92,8 @@ app.post('/api/productpreview', upload.array('previewImage'), uploadPreview);
 app.get('/api/product/getproductbyid/:productid', getproductbyid);
 app.post('/api/product/modify', upload.single('file'), modify);
 app.get('/api/product/getAllBySubcategory/:type', getAllProductBySubcategory);
+
+app.post('/api/productdownload', upload.array('downloadFile'), uploadDownloadFile);
 
 // Banner Upload Request
 app.post('/api/banner', upload.array('bannerimage'), uploadBanner);
