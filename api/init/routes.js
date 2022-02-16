@@ -4,7 +4,7 @@ var multer = require('multer');
 const app = Router();
 
 // connection with mongoDB database
-mongoose.connect("mongodb://127.0.0.1:27017/marketplace", { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false, })
+mongoose.connect("mongodb+srv://surindermdb:Madbrains@2018@cluster0.hpf2a.mongodb.net/test", { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false, })
   .then(() => {
     console.log("server Connected");
   }).catch((err) => {
