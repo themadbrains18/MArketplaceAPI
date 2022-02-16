@@ -112,7 +112,7 @@ app.post('/api/sendVerificationEmail', (req, res, next) => {
   app.mailer.send('verificationemail', {
       to: req.body.email,
       subject: `MadBrains-Confirm your Email`,
-      data:{greet:"Hi!"+" "+ email, hostName: 'http://localhost:3000/#', emailConfirmUrl: confirmEmailUrl}
+      data:{greet:"Hi!"+" "+ email, hostName: 'https://themadbrains18.github.io/Marketplace-React/#', emailConfirmUrl: confirmEmailUrl}
   }, (err) => {
       if (err) {
 
@@ -132,7 +132,7 @@ app.post('/api/sendForgetPassword', (req, res, next) => {
   app.mailer.send('forgetpassword', {
       to: req.body.email,
       subject: `MadBrains-Forget Password`,
-      data:{greet:"Hi!"+" "+ email, hostName: 'http://localhost:3000/#', forgetpasswordUrl: forgetpasswordUrl}
+      data:{greet:"Hi!"+" "+ email, hostName: 'https://themadbrains18.github.io/Marketplace-React/#', forgetpasswordUrl: forgetpasswordUrl}
   }, (err) => {
       if (err) {
 
