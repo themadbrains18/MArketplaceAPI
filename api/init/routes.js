@@ -3,13 +3,14 @@ const mongoose = require('mongoose');
 var multer = require('multer');
 const app = Router();
 
-// connection with mongoDB database
+// connection with mongoDB database start
 mongoose.connect("mongodb+srv://surindermdb:Madbrains@2018@cluster0.hpf2a.mongodb.net/test", { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false, })
   .then(() => {
     console.log("server Connected");
   }).catch((err) => {
     console.log(err);
   })
+// connection with mongoDB database end
 
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
