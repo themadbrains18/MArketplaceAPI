@@ -12,6 +12,7 @@ mongoose.connect("mongodb+srv://surindermdb:Madbrains@2018@cluster0.hpf2a.mongod
   })
 // connection with mongoDB database end
 
+// Store file on directory start
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, './public/images');
@@ -45,6 +46,8 @@ var storage = multer.diskStorage({
   }
 });
 var upload = multer({ storage: storage, limits: { fieldSize: 25 * 1024 * 1024 } });
+
+// Store file on directory end
 
 const { getAll, savecategory, deletecategory, getcategorybyid, edit } = require('../controllers/mdcategorycontroller');
 const { getAllsubcategory, savesubcategory, deletesubcategory, getsubcategorybyid, editsubcategory } = require('../controllers/mdsubcategorycontroller');
