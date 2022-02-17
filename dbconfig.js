@@ -11,6 +11,7 @@ const  config = {
     smtp_password : 'lmmyrkpjsebbdgoj',
     SMTP_SECURE : false,
     APIURL:'https://peaceful-castle-24268.herokuapp.com/api/'
+    // APIURL:'http://localhost:3002/api/'
 }
 
 module.exports = config;
