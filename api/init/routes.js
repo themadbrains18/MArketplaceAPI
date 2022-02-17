@@ -15,7 +15,7 @@ mongoose.connect("mongodb+srv://surindermdb:Madbrains@2018@cluster0.hpf2a.mongod
 // Store file on directory start
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './tmp/images'); //store images on temp folder
+    cb(null, './public/images'); //store images on temp folder
   },
   filename: (req, file, cb) => {
     console.log(file);
