@@ -228,6 +228,7 @@ const getproductbyid = async (req, res) => {
     })
 }
 
+// API Update product detail start
 const modify = async (req, res) => {
     const token = req.headers['authorization'];
     if (!token) {
@@ -268,7 +269,7 @@ const modify = async (req, res) => {
     })
 
 }
-
+// API Update product detail start
 
 // API List of all  product by subcategory eg: web, mobile
 const getAllProductBySubcategory = async (req, res) => {
