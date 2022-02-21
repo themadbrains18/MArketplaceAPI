@@ -48,6 +48,11 @@ const productSchema = new mongoose.Schema({
     tools: {
         type: Schema.Types.ObjectId, ref: 'Tools'
     },
+    template: {
+        type: String,
+        required: true,
+        trim: true,
+    },
 }, { timestamps: true });
 
 let productColl = mongoose.model("Product", productSchema); //create model/schema using mongoose
@@ -55,12 +60,15 @@ let productColl = mongoose.model("Product", productSchema); //create model/schem
 // API Save product
 const saveproduct = async (req, res) => {
     const token = req.headers['authorization'];
+    console.log("template :" + req.body.template)
     if (!token) {
         return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     }
     let data = {
         "adminname": req.body.admin, "category": req.body.category, "highlight": req.body.highlight,
-        "image": req.file.filename, "overview": req.body.overview, "sharelink": req.body.link, "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools
+        "image": req.file.filename, "overview": req.body.overview, "sharelink": req.body.link, 
+        "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools,
+        "template" : req.body.template
     }
     console.log(data);
 
@@ -242,14 +250,16 @@ const modify = async (req, res) => {
     if (req.file != undefined) {
         data = {
             "adminname": req.body.admin, "category": req.body.category, "highlight": req.body.highlight,
-            "image": req.file.filename, "overview": req.body.overview, "sharelink": req.body.link, "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools
+            "image": req.file.filename, "overview": req.body.overview, "sharelink": req.body.link, 
+            "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools,"template":req.body.template
         }
         console.log(data);
     }
     else {
         data = {
-            "adminname": req.body.admin, "category": req.body.category, "highlight": req.body.highlight, "overview": req.body.overview, "sharelink": req.body.link,
-            "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools
+            "adminname": req.body.admin, "category": req.body.category, "highlight": req.body.highlight, 
+            "overview": req.body.overview, "sharelink": req.body.link,
+            "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools,"template":req.body.template
         }
         console.log(data);
     }
@@ -278,7 +288,7 @@ const getAllProductBySubcategory = async (req, res) => {
     //     return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     // }
     console.log("type : " + req.params.type);
-    productColl.find({ subcategory: req.params.type }).populate('category').populate('subcategory').populate('tools').then((data) => {
+    productColl.find({ template: req.params.type }).populate('category').populate('subcategory').populate('tools').then((data) => {
         res.status(200).send(data)
     }).catch((err) => {
         res.send(err);

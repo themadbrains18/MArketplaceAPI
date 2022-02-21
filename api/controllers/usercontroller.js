@@ -74,7 +74,7 @@ const downloadTemplate = async (req, res) => {
         return res.send({ status: 202, message: 'register user' });
       }
       else {
-        downloadColl.create({ name: req.body.name, email: req.body.email }).then((data) => {
+        downloadColl.create({ name: req.body.name, email: req.body.email, productid: req.body.productid }).then((data) => {
           if (data) {
             if (existuser.length > 0 && existuser.length < 4) {
               return res.send({ status: 201, message: 'Download Template' });
@@ -98,12 +98,10 @@ const downloadTemplate = async (req, res) => {
     }).catch((err) => {
       res.send(err);
     })
-
-    
   }
   else{
     console.log('Token exist');
-    downloadColl.create({ name: req.body.name, email: req.body.email }).then((data) => {
+    downloadColl.create({ name: req.body.name, email: req.body.email, productid: req.body.productid }).then((data) => {
       if (data) {
         return res.send({ status: 201, message: 'Download Template' });
       }

@@ -15,6 +15,9 @@ const downloadSchema = new Schema({
         required: true,
         trim: true,
     },
+    productid: {
+        type: Schema.Types.ObjectId, ref: 'Product'
+    },
 }, { timestamps: true });
 
 
