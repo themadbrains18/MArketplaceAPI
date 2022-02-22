@@ -63,6 +63,12 @@ const productSchema = new mongoose.Schema({
     },
     thumbNail:{
         type: String,
+    },
+    seodescription:{
+        type: String,
+    },
+    seokeywords:{
+        type: String,
     }
 
 }, { timestamps: true });
@@ -72,7 +78,6 @@ let productColl = mongoose.model("Product", productSchema); //create model/schem
 // API Save product
 const saveproduct = async (req, res) => {
     const token = req.headers['authorization'];
-    console.log("template :" + req.body.template)
     if (!token) {
         return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     }
@@ -80,7 +85,8 @@ const saveproduct = async (req, res) => {
         "adminname": req.body.admin, "category": req.body.category, "highlight": req.body.highlight,
         "image": req.file.filename, "overview": req.body.overview, "sharelink": req.body.link, 
         "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools,
-        "template" : req.body.template, "fonts": req.body.fonts, "productstatus": req.body.productstatus
+        "template" : req.body.template, "fonts": req.body.fonts, "productstatus": req.body.productstatus,
+        "seodescription": req.body.seodescription,"seokeywords":req.body.seokeywords
     }
 
     productColl.findOne({ title: req.body.title }).then(function (result) {
@@ -89,12 +95,9 @@ const saveproduct = async (req, res) => {
         }
         else {
             productColl.create(data).then((productdata) => {
-                console.log("tempID : " +req.body.tempId);
-                console.log("data : " + productdata);
                 // update slider table productid
                 sliderColl.find({ productid: req.body.tempId }).then((result) => {
                     if (result.length > 0) {
-                        console.log("tempID : " +req.body.tempId);
                         for (let j = 0; j < result.length; j++) {
                             sliderColl.findOneAndUpdate({ productid: req.body.tempId }, {"productid": productdata._id}).then((data) => {
                                 console.log('slider productid update successfully');
@@ -107,7 +110,6 @@ const saveproduct = async (req, res) => {
                 // update preview table productid
                 previewColl.find({ productid: req.body.tempId }).then((resultpre) => {
                     if (resultpre.length > 0) {
-                        console.log("tempID : " +req.body.tempId);
                         for (let j = 0; j < resultpre.length; j++) {
                             previewColl.findOneAndUpdate({ productid: req.body.tempId }, {"productid": productdata._id}).then((data) => {
                                 console.log('preview productid update successfully');
@@ -198,14 +200,12 @@ const deleteproduct = async (req, res) => {
     if (!token) {
         return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     }
-    console.log("req.body", req.params);
     productColl.findOne({ _id: req.params.id }).then((result) => {
         if (result) {
             // product slider remove from productslider table and image file from directory
             sliderColl.find({ productid: req.params.id }).then((resultslider) => {
                 if (resultslider.length > 0) {
                     for (let j = 0; j < resultslider.length; j++) {
-                        console.log("image Name " + resultslider[j].image);
                         const pathToFile = './public/images/' + resultslider[j].image
                         fs.unlink(pathToFile, function (err) {
                             if (err) {
@@ -227,7 +227,6 @@ const deleteproduct = async (req, res) => {
             previewColl.find({ productid: req.params.id }).then((resultpre) => {
                 if (resultpre.length > 0) {
                     for (let j = 0; j < resultpre.length; j++) {
-                        console.log("image Name " + resultpre[j].image);
                         const pathToFile = './public/images/' + resultpre[j].image
                         fs.unlink(pathToFile, function (err) {
                             if (err) {
@@ -248,7 +247,6 @@ const deleteproduct = async (req, res) => {
 
             // product remove from product table
             productColl.deleteOne({ _id: req.params.id }).then((data) => {
-                console.log("image Name " + result.image);
                 const pathToFile = './public/images/' + result.image
                 fs.unlink(pathToFile, function (err) {
                     if (err) {
@@ -275,11 +273,9 @@ const getproductbyid = async (req, res) => {
     // if (!token) {
     //     return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     // }
-    console.log("Get Product API call by id");
     let data = { product: {}, productslider: [], productPreview: [] , downloadablefile: {}, productHeroImage:[], productThumbImage:[], productCompatibility:[] };
     // get data of main product collection/table
     productColl.findOne({ _id: req.params.productid }).then((resproduct) => {
-        console.log(resproduct);
         if (resproduct) {
             data.product = resproduct;
             if(resproduct.tools!=''){
@@ -290,10 +286,8 @@ const getproductbyid = async (req, res) => {
                     })
                 }
             }
-            console.log("success Product data");
             // get data of product slider by productid collection/table
             sliderColl.find({ productid: req.params.productid }).then((slider) => {
-                console.log("success slider data");
                 if (slider.length > 0) {
                     for (let i = 0; i < slider.length; i++) {
                         data.productslider.push(slider[i]);
@@ -301,7 +295,6 @@ const getproductbyid = async (req, res) => {
                 }
                 // get data of product preview by productid collection/table
                 previewColl.find({ productid: req.params.productid }).then((preview) => {
-                    console.log("success preview data");
                     if (preview.length > 0) {
                         for (let j = 0; j < preview.length; j++) {
                             data.productPreview.push(preview[j]);
@@ -329,6 +322,8 @@ const getproductbyid = async (req, res) => {
                                 else {
                                     return res.status(200).send(data);
                                 }
+                            }).catch((err) => {
+                                res.send(err);
                             })
                         })
                     }).catch((err) => {
@@ -355,8 +350,6 @@ const modify = async (req, res) => {
         return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     }
     const { id } = req.body;
-    console.log(id);
-    console.log(req.file);
     let data;
 
     if (req.file != undefined) {
@@ -364,18 +357,18 @@ const modify = async (req, res) => {
             "adminname": req.body.admin, "category": req.body.category, "highlight": req.body.highlight,
             "image": req.file.filename, "overview": req.body.overview, "sharelink": req.body.link, 
             "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools,"template":req.body.template,
-            "fonts": req.body.fonts, "productstatus": req.body.productstatus
+            "fonts": req.body.fonts, "productstatus": req.body.productstatus,
+            "seodescription": req.body.seodescription,"seokeywords":req.body.seokeywords
         }
-        console.log(data);
     }
     else {
         data = {
             "adminname": req.body.admin, "category": req.body.category, "highlight": req.body.highlight, 
             "overview": req.body.overview, "sharelink": req.body.link,
             "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools,"template":req.body.template,
-            "fonts": req.body.fonts, "productstatus": req.body.productstatus
+            "fonts": req.body.fonts, "productstatus": req.body.productstatus,
+            "seodescription": req.body.seodescription,"seokeywords":req.body.seokeywords
         }
-        console.log(data);
     }
     productColl.findOne({ title: req.body.title, _id: { $ne: id } }).then(function (result) {
         if (result) {
@@ -401,7 +394,6 @@ const getAllProductBySubcategory = async (req, res) => {
     // if (!token) {
     //     return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     // }
-    console.log("type : " + req.params.type);
     productColl.find({ template: req.params.type }).populate('category').populate('subcategory').then((data) => {
         res.status(200).send(data)
     }).catch((err) => {

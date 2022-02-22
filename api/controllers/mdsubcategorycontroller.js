@@ -41,7 +41,6 @@ const savesubcategory= async (req,res)=>{
     if (!token) {
         return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     }
-    console.log("req.body",req.body);
 
     subcategoryColl.findOne({ name: req.body.name, category: req.body.category }).then(function (result) {
         if (result) {
@@ -70,7 +69,6 @@ const deletesubcategory=async(req,res)=>{
     if (!token) {
         return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     }
-    console.log("req.body",req.body);
     subcategoryColl.deleteOne({_id: req.params.id}).then((data)=>{
         res.send(data)
     }).catch((err)=>{
@@ -84,7 +82,6 @@ const getsubcategorybyid= async(req,res)=>{
     if (!token) {
         return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     }
-    console.log("req.body",req.params.id);
     subcategoryColl.findById({_id: req.params.id}).then((data)=>{
         res.status(200).send(data)
     }).catch((err)=>{
@@ -98,7 +95,6 @@ const editsubcategory =async(req,res)=>{
     if (!token) {
         return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     }
-    console.log("req.body",req.body);
     subcategoryColl.findOne({ name: req.body.name, category: req.body.categoryid }).then(function (result) {
         if (result) {
             return res.send({ status: 401, message: 'SubCategory already exist.' });

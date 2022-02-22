@@ -14,15 +14,12 @@ let bannerColl = mongoose.model("Banner", bannerSchema); //create schema of Bann
 
 // API upload Banner slider
 const uploadBanner = (req, res) => {
-    console.log(req.files.length);
     let bannerloaddata = [];
     for (let i = 0; i < req.files.length; i++) {
         let imageurl = req.files[i].filename;
-        console.log("file name : " + imageurl);
         var loadData = { image: imageurl };
         bannerColl.create(loadData).then((result) => {
             bannerloaddata.push(result);
-            console.log(result);
             if (req.files.length === bannerloaddata.length) {
                 res.send({ status: 200, sliderdata: bannerloaddata, message: "You have save banner slide successfully" });
             }
@@ -49,7 +46,6 @@ const getBanner = (req, res) => {
 
 const deleteBanner = (req, res) => {
     bannerColl.findOne({ _id: req.params.id }).then((result)=>{
-        console.log("banner image " +result.image)
         bannerColl.deleteOne({ _id: req.params.id }).then((data) => {
             if(data.deletedCount>0){
                 const pathToFile = './public/images/' +result.image

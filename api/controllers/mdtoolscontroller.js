@@ -60,7 +60,6 @@ const getToolsById=async(req,res)=>{
     if (!token) {
         return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     }
-    console.log("req.body",req.params.id);
     toolColl.findById({_id: req.params.id}).then((data)=>{
         res.status(200).send(data)
     }).catch((err)=>{
@@ -74,7 +73,6 @@ const deleteTools = async(req,res)=>{
     if (!token) {
         return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     }
-    console.log("req.body",req.params);
     toolColl.deleteOne({_id: req.params.id}).then((data)=>{
         res.send(data)
     }).catch((err)=>{
@@ -89,7 +87,6 @@ const editTools =async(req,res) =>{
     if (!token) {
         return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     }
-    console.log(req.body.id);
     toolColl.findOne({ name: req.body.name }).then(function (result) {
         if (result) {
             return res.send({ status: 401, message: 'Tools already exist.' });

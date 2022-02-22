@@ -10,7 +10,6 @@ const tokenSecret = 'mdb!@#123psd';
 // API Save product
 const register = async (req, res) => {
   userColl.findOne({ username: req.body.username }).then((result) => {
-    console.log(result);
     if (result) {
       return res.send({ status: 409, message: 'Email already exist!' });
     }
@@ -67,7 +66,6 @@ const login = async (req, res, next) => {
 const downloadTemplate = async (req, res) => {
   
   if(req.body.token == undefined){
-    console.log('Token undefined');
     downloadColl.find({ email: req.body.email }).then((existuser) => {
       console.log('exist length '+ existuser.length);
       if (existuser.length == 3) {
