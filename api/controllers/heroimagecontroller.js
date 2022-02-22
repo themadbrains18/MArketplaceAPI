@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const fs = require("fs")
-var Schema = mongoose.Schema;
 
-const sliderSchema = new mongoose.Schema({
+const heroSchema = new mongoose.Schema({
 
     image: {
         type: String,
@@ -12,16 +11,17 @@ const sliderSchema = new mongoose.Schema({
     productid: {
         type: String,
         required: true,
-    }
+    },
 }, { timestamps: true });
 
-let sliderColl = mongoose.model("Slider", sliderSchema); //create schema of product slider
+let productHeroImageColl = mongoose.model("ProductHeroImage", heroSchema);
 
-// API upload product preview file in productpreview collection/table
-const uploadSlider = (req, res) => {
+// API upload product Hero image file in product hero image collection/table
+const uploadHeroImage = (req, res) => {
     const { productid } = req.body;
+    console.log(productid);
     console.log(req.files.length);
-    sliderColl.find({ productid: productid }).then((result) => {
+    productHeroImageColl.find({ productid: productid }).then((result) => {
         if (result.length > 0) {
             for (let j = 0; j < result.length; j++) {
                 console.log("image Name "+ result[j].image);
@@ -34,39 +34,37 @@ const uploadSlider = (req, res) => {
                     }
                 })
             }
-            deleteSlider(productid,req,res);
+            deletePreview(productid,req,res);
         }
         else {
-            deleteSlider(productid,req,res);
+            deletePreview(productid,req,res);
         }
     })
-
 }
 
-const deleteSlider = (productid,req,res) => {
-    sliderColl.deleteMany({ productid: productid }).then((data) => {
+const deletePreview = (productid,req,res) => {
+    productHeroImageColl.deleteMany({ productid: productid }).then((data) => {
         console.log(data);
         if (data.ok > 0) {
-            let sliderloaddata = [];
+            let preloaddata = [];
             for (let i = 0; i < req.files.length; i++) {
                 let imageurl = req.files[i].filename;
                 console.log("file name : " + imageurl);
                 var loadData = { productid: productid, image: imageurl };
-                sliderColl.create(loadData).then((result) => {
-                    sliderloaddata.push(result);
+                productHeroImageColl.create(loadData).then((result) => {
                     console.log(result);
-                    if (req.files.length === sliderloaddata.length) {
-                        res.send({ status: 200, sliderdata: sliderloaddata, message: "You have save Slider successfully" });
+                    preloaddata.push(result);
+                    if (req.files.length === preloaddata.length) {
+                        res.send({ status: 200, previewloaddata: preloaddata, message: "You have save hero image successfully" });
                     }
+
                 }).catch((err) => {
                     res.send(err);
                 })
             }
-
-
+            
         }
 
-        // res.send(data)
     }).catch((err) => {
         res.send(err);
     })
@@ -74,6 +72,6 @@ const deleteSlider = (productid,req,res) => {
 
 
 module.exports = {
-    uploadSlider,
-    sliderColl
+    uploadHeroImage,
+    productHeroImageColl
 }

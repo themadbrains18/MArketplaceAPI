@@ -43,10 +43,10 @@ const savetool = async (req,res)=>{
 
 // API all record from Tools collection/table
 const getAllTool = async (req,res)=>{
-    const token = req.headers['authorization'];
-    if (!token) {
-        return res.status(401).send({ auth: false, message: 'unauthorized user.' });
-    }
+    // const token = req.headers['authorization'];
+    // if (!token) {
+    //     return res.status(401).send({ auth: false, message: 'unauthorized user.' });
+    // }
     toolColl.find().then((data)=>{
         res.status(200).send(data)
     }).catch((err)=>{
@@ -115,5 +115,6 @@ module.exports = {
     getAllTool,
     getToolsById,
     deleteTools,
-    editTools
+    editTools,
+    toolColl
 }

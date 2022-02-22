@@ -6,7 +6,7 @@ const app = Router();
 // connection with mongoDB database start
 // mongodb+srv://surindermdb:Madbrains@2018@cluster0.hpf2a.mongodb.net/test
 // mongodb://127.0.0.1:27017/marketplace
-mongoose.connect("mongodb://127.0.0.1:27017/marketplace", { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false, })
+mongoose.connect("mongodb+srv://surindermdb:Madbrains@2018@cluster0.hpf2a.mongodb.net/test", { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false, })
   .then(() => {
     console.log("server Connected");
   }).catch((err) => {
@@ -60,6 +60,8 @@ const { uploadPreview } = require('../controllers/mdpreviewcontroller');
 const { register, login, downloadTemplate, verifyemail, forgetpassword, changepassword } = require('../controllers/usercontroller');
 const { uploadBanner, getBanner, deleteBanner } = require('../controllers/bannercontroller');
 const { uploadDownloadFile } = require('../controllers/mdproductdownloadcontroller');
+const {uploadHeroImage} = require('../controllers/heroimagecontroller');
+const {uploadThumbImage} = require('../controllers/thumbimagecontroller');
 
 app.post('/api/register', register);
 app.post('/api/login', login);
@@ -98,7 +100,8 @@ app.post('/api/productpreview', upload.array('previewImage'), uploadPreview);
 app.get('/api/product/getproductbyid/:productid', getproductbyid);
 app.post('/api/product/modify', upload.single('file'), modify);
 app.get('/api/product/getAllBySubcategory/:type', getAllProductBySubcategory);
-
+app.post('/api/productheroimage' , upload.array('heroImage'), uploadHeroImage);
+app.post('/api/productthumbimage' , upload.array('thumbImage'), uploadThumbImage);
 app.post('/api/productdownload', upload.array('downloadFile'), uploadDownloadFile);
 
 // Banner Upload Request

@@ -14,7 +14,8 @@ const productDownloadSchema = new mongoose.Schema({
         trim: true,
     },
     productid: {
-        type: Schema.Types.ObjectId, ref: 'Product'
+        type: String,
+        required: true,
     },
 }, { timestamps: true });
 
