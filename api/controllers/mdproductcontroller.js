@@ -3,6 +3,9 @@ const fs = require("fs");
 var { sliderColl } = require('./mdslidercontroller');
 var { previewColl } = require('./mdpreviewcontroller');
 var { productDownloadColl } = require('./mdproductdownloadcontroller');
+var {productHeroImageColl}=require('./heroimagecontroller');
+var {productThumbImageColl}=require('./thumbimagecontroller');
+var{toolColl}=require('./mdtoolscontroller');
 
 var Schema = mongoose.Schema;
 
@@ -17,11 +20,6 @@ const productSchema = new mongoose.Schema({
     category: {
         type: Schema.Types.ObjectId, ref: 'Category'
     },
-    highlight: {
-        type: String,
-        required: true,
-        trim: true,
-    },
     image: {
         type: String,
         required: true,
@@ -29,13 +27,14 @@ const productSchema = new mongoose.Schema({
     },
     overview: {
         type: String,
-        required: true,
+        trim: true,
+    },
+    highlight: {
+        type: String,
         trim: true,
     },
     sharelink: {
         type: String,
-        required: true,
-        trim: true,
     },
     subcategory: {
         type: Schema.Types.ObjectId, ref: 'Subcategory'
@@ -45,14 +44,27 @@ const productSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-    tools: {
-        type: Schema.Types.ObjectId, ref: 'Tools'
-    },
     template: {
         type: String,
         required: true,
         trim: true,
     },
+    tools:{
+        type: String,
+    },
+    fonts:{
+        type: String,
+    }
+    ,
+    productstatus:{
+        type: String,
+        required: true,
+        trim: true,
+    },
+    thumbNail:{
+        type: String,
+    }
+
 }, { timestamps: true });
 
 let productColl = mongoose.model("Product", productSchema); //create model/schema using mongoose
@@ -68,17 +80,77 @@ const saveproduct = async (req, res) => {
         "adminname": req.body.admin, "category": req.body.category, "highlight": req.body.highlight,
         "image": req.file.filename, "overview": req.body.overview, "sharelink": req.body.link, 
         "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools,
-        "template" : req.body.template
+        "template" : req.body.template, "fonts": req.body.fonts, "productstatus": req.body.productstatus
     }
-    console.log(data);
 
     productColl.findOne({ title: req.body.title }).then(function (result) {
         if (result) {
             return res.send({ status: 401, message: 'Product already exist.' });
         }
         else {
-            productColl.create(data).then((data) => {
-                res.send({ status: 200, productdata: data, message: "You have save product successfully" });
+            productColl.create(data).then((productdata) => {
+                console.log("tempID : " +req.body.tempId);
+                console.log("data : " + productdata);
+                // update slider table productid
+                sliderColl.find({ productid: req.body.tempId }).then((result) => {
+                    if (result.length > 0) {
+                        console.log("tempID : " +req.body.tempId);
+                        for (let j = 0; j < result.length; j++) {
+                            sliderColl.findOneAndUpdate({ productid: req.body.tempId }, {"productid": productdata._id}).then((data) => {
+                                console.log('slider productid update successfully');
+                            }).catch((err) => {
+                                res.send(err);
+                            })
+                        }
+                    }
+                })
+                // update preview table productid
+                previewColl.find({ productid: req.body.tempId }).then((resultpre) => {
+                    if (resultpre.length > 0) {
+                        console.log("tempID : " +req.body.tempId);
+                        for (let j = 0; j < resultpre.length; j++) {
+                            previewColl.findOneAndUpdate({ productid: req.body.tempId }, {"productid": productdata._id}).then((data) => {
+                                console.log('preview productid update successfully');
+                            }).catch((err) => {
+                                res.send(err);
+                            })
+                        }
+                    }
+                })
+
+                // update downloadable table productid
+                productDownloadColl.find({ productid: req.body.tempId }).then((fileitem)=>{
+                    if (fileitem.length > 0){
+                        productDownloadColl.findOneAndUpdate({ productid: req.body.tempId }, {"productid": productdata._id}).then((data) => {
+                            console.log('download file productid update successfully');
+                        }).catch((err) => {
+                            res.send(err);
+                        })
+                    }
+                })
+                
+                // update hero image table productid
+                productHeroImageColl.find({ productid: req.body.tempId }).then((heroitem)=>{
+                    if (heroitem.length > 0){
+                        productHeroImageColl.findOneAndUpdate({ productid: req.body.tempId }, {"productid": productdata._id}).then((data) => {
+                            console.log('hero image productid update successfully');
+                        }).catch((err) => {
+                            res.send(err);
+                        })
+                    }
+                })
+                
+                // update thumb image table productid
+                productThumbImageColl.find({ productid: req.body.tempId }).then((thumbitem)=>{
+                    if (thumbitem.length > 0){
+                        productThumbImageColl.findOneAndUpdate({ productid: req.body.tempId }, {"productid": productdata._id}).then((data) => {
+                            console.log('thumb image productid update successfully');
+                        }).catch((err) => {
+                            res.send(err);
+                        })
+                    }
+                })
+                res.send({ status: 200, productdata: productdata, message: "You have save product successfully" });
             }).catch((err) => {
                 res.send(err);
             })
@@ -94,9 +166,27 @@ const getAllProduct = async (req, res) => {
     // if (!token) {
     //     return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     // }
-    console.log("Get Product API call");
-    productColl.find().populate('category').populate('subcategory').populate('tools').then((data) => {
-        res.status(200).send(data)
+    productColl.find().populate('category').populate('subcategory').then((data) => {
+        let listData=data;
+        if(data.length>0){
+            let j=0;
+            for(let i=0; i<listData.length;i++){
+                productThumbImageColl.findOne({productid: listData[i]._id}).then((list)=>{
+                    j++;
+                    if(list){
+                        listData[i].thumbNail=list.image;
+                    }
+                    else{
+                        listData[i].thumbNail='';
+                    }
+                    if(listData.length==j){
+                        console.log("return response");
+                        res.status(200).send(listData)
+                    }
+                })
+            }
+        }
+        
     }).catch((err) => {
         res.send(err);
     })
@@ -186,12 +276,20 @@ const getproductbyid = async (req, res) => {
     //     return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     // }
     console.log("Get Product API call by id");
-    let data = { product: {}, productslider: [], productPreview: [] , downloadablefile: {} };
+    let data = { product: {}, productslider: [], productPreview: [] , downloadablefile: {}, productHeroImage:[], productThumbImage:[], productCompatibility:[] };
     // get data of main product collection/table
-    productColl.findOne({ _id: req.params.productid }).populate('tools').then((resproduct) => {
+    productColl.findOne({ _id: req.params.productid }).then((resproduct) => {
         console.log(resproduct);
         if (resproduct) {
             data.product = resproduct;
+            if(resproduct.tools!=''){
+                let Compatibility=resproduct.tools.split(',');
+                for(let k=0; k<Compatibility.length;k++){
+                    toolColl.findOne({_id:Compatibility[k]}).then((tool)=>{
+                        data.productCompatibility.push(tool);
+                    })
+                }
+            }
             console.log("success Product data");
             // get data of product slider by productid collection/table
             sliderColl.find({ productid: req.params.productid }).then((slider) => {
@@ -214,11 +312,25 @@ const getproductbyid = async (req, res) => {
                     productDownloadColl.find({productid: req.params.productid}).then((downloadfile)=>{
                         if(downloadfile){
                             data.downloadablefile=downloadfile;
-                            return res.status(200).send(data);
                         }
-                        else {
-                            return res.status(200).send(data);
-                        }
+                        productHeroImageColl.find({productid: req.params.productid}).then((heromimage)=>{
+                            if (heromimage.length > 0) {
+                                for (let j = 0; j < heromimage.length; j++) {
+                                    data.productHeroImage.push(heromimage[j]);
+                                }
+                            }
+                            productThumbImageColl.find({productid: req.params.productid}).then((thumbimage)=>{
+                                if (thumbimage.length > 0) {
+                                    for (let j = 0; j < thumbimage.length; j++) {
+                                        data.productThumbImage.push(thumbimage[j]);
+                                    }
+                                    return res.status(200).send(data);
+                                }
+                                else {
+                                    return res.status(200).send(data);
+                                }
+                            })
+                        })
                     }).catch((err) => {
                         res.send(err);
                     })
@@ -251,7 +363,8 @@ const modify = async (req, res) => {
         data = {
             "adminname": req.body.admin, "category": req.body.category, "highlight": req.body.highlight,
             "image": req.file.filename, "overview": req.body.overview, "sharelink": req.body.link, 
-            "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools,"template":req.body.template
+            "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools,"template":req.body.template,
+            "fonts": req.body.fonts, "productstatus": req.body.productstatus
         }
         console.log(data);
     }
@@ -259,7 +372,8 @@ const modify = async (req, res) => {
         data = {
             "adminname": req.body.admin, "category": req.body.category, "highlight": req.body.highlight, 
             "overview": req.body.overview, "sharelink": req.body.link,
-            "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools,"template":req.body.template
+            "subcategory": req.body.subcategory, "title": req.body.title, "tools": req.body.tools,"template":req.body.template,
+            "fonts": req.body.fonts, "productstatus": req.body.productstatus
         }
         console.log(data);
     }
@@ -288,7 +402,7 @@ const getAllProductBySubcategory = async (req, res) => {
     //     return res.status(401).send({ auth: false, message: 'unauthorized user.' });
     // }
     console.log("type : " + req.params.type);
-    productColl.find({ template: req.params.type }).populate('category').populate('subcategory').populate('tools').then((data) => {
+    productColl.find({ template: req.params.type }).populate('category').populate('subcategory').then((data) => {
         res.status(200).send(data)
     }).catch((err) => {
         res.send(err);
